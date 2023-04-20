@@ -1,0 +1,96 @@
+#include <iostream>
+#include <fstream>
+#include <stack>
+#include <string>
+#include <cmath>
+
+using namespace std;
+
+// Function to check if a character is an operator
+bool isOperator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/' || c == '^');
+}
+
+// Function to get precedence of an operator
+int precedence(char op) {
+    if (op == '^')
+        return 3;
+    else if (op == '*' || op == '/')
+        return 2;
+    else if (op == '+' || op == '-')
+        return 1;
+    else
+        return -1;
+}
+
+// Function to convert infix expression to postfix
+string infixToPostfix(string expression) {
+    string postfix = "";
+    stack<char> s;
+
+    for (int i = 0; i < expression.length(); i++) {
+        // If the character is a digit or a decimal point, add it to the postfix string
+        if (isdigit(expression[i]) || expression[i] == '.') {
+            postfix += expression[i];
+        }
+        // If the character is an operator, pop all operators from the stack that have higher or equal precedence
+        // and add them to the postfix string, then push the current operator onto the stack
+        else if (isOperator(expression[i])) {
+            while (!s.empty() && precedence(s.top()) >= precedence(expression[i])) {
+                postfix += s.top();
+                s.pop();
+            }
+            s.push(expression[i]);
+        }
+        // If the character is a left parenthesis, push it onto the stack
+        else if (expression[i] == '(') {
+            s.push(expression[i]);
+        }
+        // If the character is a right parenthesis, pop all operators from the stack and add them to the postfix string
+        // until a left parenthesis is encountered, then pop the left parenthesis
+        else if (expression[i] == ')') {
+            while (!s.empty() && s.top() != '(') {
+                postfix += s.top();
+                s.pop();
+            }
+            s.pop();
+        }
+    }
+
+    // Pop all remaining operators from the stack and add them to the postfix string
+    while (!s.empty()) {
+        postfix += s.top();
+        s.pop();
+    }
+
+    return postfix;
+}
+
+// Function to evaluate a postfix expression
+double evaluatePostfix(string postfix) {
+    stack<double> s;
+
+    for (int i = 0; i < postfix.length(); i++) {
+        // If the character is a digit or a decimal point, convert it to a double and push it onto the stack
+        if (isdigit(postfix[i]) || postfix[i] == '.') {
+            double num = 0;
+            int decimal = 0;
+            while (i < postfix.length() && (isdigit(postfix[i]) || postfix[i] == '.')) {
+                if (postfix[i] == '.') {
+                    decimal = 1;
+                }
+                else if (decimal == 0) {
+                    num = num * 10 + (postfix[i] - '0');
+                }
+                else {
+                    num = num + (postfix[i] - '0') * pow(10, -decimal);
+                    decimal++;
+                }
+                i++;
+            }
+            i--;
+            s.push(num);
+        }
+        // If the character is an operator, pop the last two operands from the stack, apply the operator to them,
+        // and push the result onto
+

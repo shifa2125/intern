@@ -1,0 +1,19 @@
+from textblob import TextBlob
+
+def get_sentiment(text):
+    """
+    This function takes a text as input and returns the sentiment of the text
+    as 'positive', 'negative', or 'neutral'.
+    """
+    blob = TextBlob(text)
+    sentiment = blob.sentiment.polarity
+    if sentiment > 0:
+        return 'positive'
+    elif sentiment < 0:
+        return 'negative'
+    else:
+        return 'neutral'
+
+input_text = input("Enter some text: ")
+sentiment = get_sentiment(input_text)
+print("The sentiment of the text is:", sentiment)
